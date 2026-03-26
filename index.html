@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IBE — The Mechanism of Support</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --ink:      #1a1814;
+    --ink-mid:  #4a4740;
+    --ink-light:#8a8680;
+    --rule:     #c8c4bc;
+    --paper:    #f8f5f0;
+    --cream:    #f0ece4;
+    --amber:    #b06a00;
+    --amber-bg: #fdf3e0;
+    --blue:     #1a4a7a;
+    --blue-bg:  #eaf0f8;
+    --serif:    'EB Garamond', 'Georgia', serif;
+  }
+
+  html, body {
+    height: 100%;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--serif);
+    font-size: 17px;
+    line-height: 1.6;
+  }
+
+  body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 2rem 1rem;
+  }
+
+  .page {
+    width: 100%;
+    max-width: 680px;
+  }
+
+  header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+    border-bottom: 1px solid var(--rule);
+    padding-bottom: 1.5rem;
+  }
+
+  header .kicker {
+    font-size: 13px;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--ink-mid);
+    margin-bottom: .5rem;
+  }
+
+  header h1 {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: 2.1rem;
+    font-weight: 600;
+    letter-spacing: .01em;
+    line-height: 1.2;
+    color: var(--ink);
+  }
+
+  header p {
+    margin-top: .6rem;
+    font-size: 14px;
+    font-style: italic;
+    color: var(--ink-mid);
+  }
+
+  .diagram-wrap {
+    background: #fff;
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    padding: 1.5rem 1rem 1rem;
+    margin-bottom: 1.25rem;
+  }
+
+  svg text {
+    font-family: var(--serif) !important;
+  }
+
+  /* Caption card */
+  .caption {
+    border: 1px solid var(--rule);
+    border-radius: 3px;
+    padding: 1rem 1.25rem;
+    min-height: 88px;
+    background: var(--cream);
+    margin-bottom: 1.25rem;
+  }
+
+  .caption-step {
+    font-size: 12px;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--ink-mid);
+    margin-bottom: .35rem;
+  }
+
+  .caption-body {
+    font-size: 15px;
+    line-height: 1.7;
+    color: var(--ink);
+  }
+
+  /* Controls */
+  .controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 2.5rem;
+  }
+
+  .dot {
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: background .2s;
+  }
+  .dot:hover { background: var(--cream); }
+  .dot::after {
+    content: '';
+    display: block;
+    width: 9px; height: 9px;
+    border-radius: 50%;
+    background: var(--rule);
+    transition: background .2s;
+  }
+  .dot.on::after { background: var(--ink); }
+  .dot:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; border-radius: 50%; }
+
+  .ctrl-btn {
+    background: none;
+    border: 1px solid var(--rule);
+    border-radius: 3px;
+    padding: 8px 20px;
+    cursor: pointer;
+    font-family: var(--serif);
+    font-size: 14px;
+    color: var(--ink-mid);
+    margin-left: 10px;
+    min-height: 44px;
+    transition: background .15s;
+  }
+  .ctrl-btn:hover { background: var(--cream); }
+  .ctrl-btn:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
+
+  .albl { opacity: 0; transition: opacity .5s ease; }
+  .albl.vis { opacity: 1; }
+
+  footer {
+    text-align: center;
+    font-size: 13px;
+    color: var(--ink-mid);
+    font-style: italic;
+    border-top: 1px solid var(--rule);
+    padding-top: 1.2rem;
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <header>
+    <p class="kicker">Inference to the Best Explanation</p>
+    <h1>The Mechanism of Support</h1>
+    <p>Why does trace data support a conclusion? Because the conclusion explains it.</p>
+  </header>
+
+  <div class="diagram-wrap">
+    <svg width="100%" viewBox="0 0 680 370" style="display:block"
+      role="img" aria-labelledby="svg-title svg-desc">
+      <title id="svg-title">IBE Diagram: The Mechanism of Support</title>
+      <desc id="svg-desc">An animated diagram showing that a Conclusion explains Trace Data, and that this explanatory relationship is the mechanism by which Trace Data supports the Conclusion. A diagnostic double line separates the two nodes.</desc>
+
+      <!-- Explain arrow: Conclusion → Trace Data (upward, no built-in marker) -->
+      <line id="exp" x1="316" y1="290" x2="316" y2="92"
+        stroke="#1a1814" stroke-width="2.2"
+        stroke-dasharray="198" stroke-dashoffset="198"/>
+      <path id="exp-ah" d="M308 99 L316 90 L324 99"
+        fill="none" stroke="#1a1814" stroke-width="2.2"
+        stroke-linecap="round" stroke-linejoin="round" opacity="0"/>
+
+      <!-- Support arrow: Trace Data → Conclusion (downward) -->
+      <line id="sup" x1="364" y1="86" x2="364" y2="284"
+        stroke="#1a4a7a" stroke-width="2"
+        stroke-dasharray="198" stroke-dashoffset="198"/>
+      <path id="sup-ah" d="M356 277 L364 286 L372 277"
+        fill="none" stroke="#1a4a7a" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round" opacity="0"/>
+
+      <!-- TRACE DATA BOX — drawn on top to mask arrow endpoints -->
+      <rect id="tdr" x="210" y="28" width="260" height="58" rx="3"
+        style="fill:#fff; stroke:#c8c4bc; stroke-width:.8px; transition:stroke .3s,stroke-width .3s,fill .3s"/>
+      <text id="td-main"
+        x="340" y="49"
+        text-anchor="middle" dominant-baseline="central"
+        style="font-size:18px; letter-spacing:.03em; fill:#1a1814">Trace Data</text>
+      <text id="td-plea"
+        x="340" y="72"
+        text-anchor="middle" dominant-baseline="central"
+        style="font-size:13px; font-style:italic; fill:#b06a00; opacity:0; transition:opacity .5s">
+        explain me!
+      </text>
+
+      <!-- DIAGNOSTIC DOUBLE LINE -->
+      <line x1="70" y1="186" x2="570" y2="186"
+        stroke="#c8c4bc" stroke-width="1" stroke-dasharray="7 4"/>
+      <line x1="70" y1="198" x2="570" y2="198"
+        stroke="#c8c4bc" stroke-width="1" stroke-dasharray="7 4"/>
+      <text x="578" y="194" dominant-baseline="central"
+        style="font-size:14px; font-style:italic; font-family:'EB Garamond',Georgia,serif; fill:#8a8680">d</text>
+
+      <!-- CONCLUSION BOX -->
+      <rect x="210" y="290" width="260" height="58" rx="3"
+        style="fill:#fff; stroke:#c8c4bc; stroke-width:.8px"/>
+      <text x="340" y="320"
+        text-anchor="middle" dominant-baseline="central"
+        style="font-size:18px; letter-spacing:.03em; fill:#1a1814">Conclusion</text>
+
+      <!-- ARROW LABELS -->
+      <g id="lexp" class="albl">
+        <rect x="210" y="210" width="86" height="24" rx="2"
+          style="fill:#fff; stroke:#c8c4bc; stroke-width:.5px"/>
+        <text x="253" y="222" text-anchor="middle" dominant-baseline="central"
+          style="font-size:13px; font-style:italic; fill:#4a4740">explains</text>
+      </g>
+
+      <g id="lsup" class="albl">
+        <rect x="384" y="128" width="82" height="24" rx="2"
+          style="fill:#fff; stroke:#c8c4bc; stroke-width:.5px"/>
+        <text x="425" y="140" text-anchor="middle" dominant-baseline="central"
+          style="font-size:13px; font-style:italic; fill:#1a4a7a">supports</text>
+      </g>
+
+    </svg>
+  </div>
+
+  <!-- Caption -->
+  <div class="caption" aria-live="polite" aria-atomic="true">
+    <div class="caption-step" id="st"></div>
+    <div class="caption-body" id="sb"></div>
+  </div>
+
+  <!-- Controls -->
+  <div class="controls" role="group" aria-label="Animation step controls">
+    <button class="dot" id="d0" onclick="go(0)" aria-label="Step 1: The scene"></button>
+    <button class="dot" id="d1" onclick="go(1)" aria-label="Step 2: The call for explanation"></button>
+    <button class="dot" id="d2" onclick="go(2)" aria-label="Step 3: The conclusion explains"></button>
+    <button class="dot" id="d3" onclick="go(3)" aria-label="Step 4: The mechanism of support"></button>
+    <button class="ctrl-btn" id="pb" onclick="togglePlay()">Pause</button>
+  </div>
+
+
+
+</div>
+
+<script>
+const STEPS = [
+  { t: 'The scene',
+    b: 'We have trace data — observable evidence that lies before us. Below the diagnostic line d sits the conclusion, the hypothesis awaiting inference.' },
+  { t: 'The call for explanation',
+    b: 'The trace data calls out for explanation. Observable facts do not account for themselves — they demand an explanation.' },
+  { t: 'The conclusion explains',
+    b: 'The conclusion explains the trace data. Were the conclusion true, we would expect to observe exactly this evidence — the explanation reaches up and accounts for it.' },
+  { t: 'The mechanism of support',
+    b: 'Because the conclusion explains the trace data, the trace data supports the conclusion. Support is not a brute fact. It flows from, and is grounded in, the explanatory relationship itself.' }
+];
+
+const tdr   = document.getElementById('tdr');
+const plea  = document.getElementById('td-plea');
+const expL  = document.getElementById('exp');
+const expAH = document.getElementById('exp-ah');
+const supL  = document.getElementById('sup');
+const supAH = document.getElementById('sup-ah');
+const lexp  = document.getElementById('lexp');
+const lsup  = document.getElementById('lsup');
+
+let cur=0, playing=true, autoT=null, pulseT=null;
+
+function ease(t){ return t<.5 ? 2*t*t : -1+(4-2*t)*t; }
+
+function animLine(lineEl, ahEl, dur, cb){
+  const len=198, t0=performance.now();
+  (function frame(now){
+    const p=Math.min((now-t0)/dur,1), ep=ease(p);
+    lineEl.setAttribute('stroke-dashoffset', len*(1-ep));
+    if(p>=1){ ahEl.style.opacity='1'; cb&&cb(); }
+    else requestAnimationFrame(frame);
+  })(t0);
+}
+
+function resetArrows(){
+  expL.setAttribute('stroke-dashoffset','198');
+  supL.setAttribute('stroke-dashoffset','198');
+  expAH.style.opacity='0';
+  supAH.style.opacity='0';
+  lexp.classList.remove('vis');
+  lsup.classList.remove('vis');
+}
+
+function stopPulse(){
+  if(pulseT){ clearInterval(pulseT); pulseT=null; }
+  tdr.style.stroke='#c8c4bc';
+  tdr.style.strokeWidth='.8px';
+  tdr.style.fill='#fff';
+  plea.style.opacity='0';
+}
+
+function startPulse(){
+  plea.style.opacity='1';
+  let ph=0;
+  const fr=[
+    {s:'#e08a00',sw:'2px',  f:'#fdf3e0'},
+    {s:'#b06a00',sw:'1.5px',f:'#fce8c0'},
+    {s:'#e08a00',sw:'2px',  f:'#fdf3e0'},
+    {s:'#c8c4bc',sw:'.8px', f:'#fff'}
+  ];
+  pulseT=setInterval(()=>{
+    const r=fr[ph%fr.length];
+    tdr.style.stroke=r.s;
+    tdr.style.strokeWidth=r.sw;
+    tdr.style.fill=r.f;
+    ph++;
+  }, 520);
+}
+
+function go(i){
+  cur=i;
+  document.getElementById('st').textContent = STEPS[i].t;
+  document.getElementById('sb').textContent = STEPS[i].b;
+  for(let j=0;j<4;j++){
+    const d = document.getElementById('d'+j);
+    d.classList.toggle('on', j===i);
+    d.setAttribute('aria-pressed', j===i ? 'true' : 'false');
+  }
+
+  stopPulse();
+  resetArrows();
+
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  if(i===1 && !reduced) startPulse();
+
+  if(i===2) animLine(expL, expAH, 950, ()=>lexp.classList.add('vis'));
+
+  if(i===3){
+    expL.setAttribute('stroke-dashoffset','0');
+    expAH.style.opacity='1';
+    lexp.classList.add('vis');
+    animLine(supL, supAH, 950, ()=>lsup.classList.add('vis'));
+  }
+
+  if(playing){ clearTimeout(autoT); autoT=setTimeout(()=>go((cur+1)%4), 4600); }
+}
+
+function togglePlay(){
+  playing=!playing;
+  const btn = document.getElementById('pb');
+  btn.textContent = playing ? 'Pause' : 'Play';
+  btn.setAttribute('aria-label', playing ? 'Pause animation' : 'Play animation');
+  if(playing){ autoT=setTimeout(()=>go((cur+1)%4), 4600); }
+  else clearTimeout(autoT);
+}
+
+go(0);
+autoT=setTimeout(()=>go(1), 4600);
+
+// Respect reduced motion — disable auto-advance and pulse
+if(window.matchMedia('(prefers-reduced-motion: reduce)').matches){
+  playing = false;
+  clearTimeout(autoT);
+  document.getElementById('pb').textContent = 'Play';
+}
+
+// Keyboard: left/right arrows to navigate steps
+document.addEventListener('keydown', e => {
+  if(e.key === 'ArrowRight') go((cur+1)%4);
+  if(e.key === 'ArrowLeft')  go((cur+3)%4);
+});
+</script>
+</body>
+</html>
